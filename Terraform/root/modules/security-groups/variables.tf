@@ -1,0 +1,9 @@
+variable project {}
+variable vpc_id {}
+variable http_port {}
+variable http_port_2 {}
+variable https_port {}
+variable ssh_port {}
+variable tcp_protocol {}
+variable ssh_protocol {}
+variable mysql_port {}

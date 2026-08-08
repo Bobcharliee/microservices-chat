@@ -1,0 +1,70 @@
+name: Build and deploy the microservices-chat application to AWS using GitHub Actions and Terraform.
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: 505265310396.dkr.ecr.us-east-1.amazonaws.com
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam:505265310396:role/github-actions-ecr-role
+          aws-region: us-east-1
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.6.0
+    
+      - name: Terraform Init
+        run: terraform -chdir=Terraform/root init
+    
+      - name: Terraform validate
+        run: terraform -chdir=Terraform/root validate
+
+      - name: Terraform Plan
+        run: terraform -chdir=Terraform/root plan -out=tfplan
+        
+      - name: Terraform Apply
+        run: terraform -chdir=Terraform/root apply -auto-approve tfplan
+      
+      - name: login to Amazon ECR
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push Docker images
+        run: |
+          docker build -t chat_front ./chat_front
+          docker tag chat_front:latest ${{ env.ECR_REGISTRY }}/chat_front:latest
+          docker push ${{ env.ECR_REGISTRY }}/chat_front:latest
+
+          docker build -t chat_svc ./chat_svc
+          docker tag chat_svc:latest ${{ env.ECR_REGISTRY }}/chat_svc:latest
+          docker push ${{ env.ECR_REGISTRY }}/chat_svc:latest
+
+          docker build -t chat_db ./chat_db
+          docker tag chat_db:latest ${{ env.ECR_REGISTRY }}/chat_db:latest
+          docker push ${{ env.ECR_REGISTRY }}/chat_db:latest
+
+      - name: Upload deployment files to S3
+        run: |
+          aws s3 cp docker-compose.deploy.yml s3://505265310396-deployment-bucket/docker-compose.deploy.yml
+          aws s3 cp debug.yaml s3://505265310396-deployment-bucket/debug.yaml
+
+      - name: Trigger ASG instance refresh
+        run: |
+          aws autoscaling start-instance-refresh --auto-scaling-group-name ms_asg --preferences '{"MinHealthyPercentage": 50, "InstanceWarmup": 120}'

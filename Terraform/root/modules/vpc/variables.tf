@@ -1,0 +1,9 @@
+variable vpc_cidr_block {}
+variable pub_subnet_1a_cidr_block {}
+variable pub_subnet_2a_cidr_block {}
+variable priv_subnet_1a_cidr_block {}
+variable priv_subnet_1b_cidr_block {}
+variable priv_subnet_2a_cidr_block {}
+variable priv_subnet_2b_cidr_block {}
+variable project_name {}
+variable aws_region {}
