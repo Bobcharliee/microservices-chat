@@ -68,7 +68,7 @@ resource "aws_iam_role_policy" "ecr_access" {
           "ecr:StartInstanceRefresh",
         ]
         Resource = "var.ecr_arn"
-      }
+      },
 
       {
         Effect  = "Allow"
