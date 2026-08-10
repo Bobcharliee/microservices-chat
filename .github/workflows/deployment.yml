@@ -8,6 +8,7 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REGISTRY: 505265310396.dkr.ecr.us-east-1.amazonaws.com
+  TF_PLUGIN_SIGNATURE_VERIFICATION: none
 
 jobs:
   build-and-deploy:
@@ -29,12 +30,13 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v2
         with:
-          terraform_version: 1.6.0
+          terraform_version: 1.9.8
     
       - name: Terraform Init
-        env: 
-            TF_SKIP_SIGNATURE_VALIDATION: true
-        run: terraform -chdir=Terraform/root init
+        env:
+          TF_SKIP_SIGNATURE_VALIDATION: true
+          TF_PLUGIN_SIGNATURE_VERIFICATION: none
+        run: terraform -chdir=Terraform/root init -upgrade
     
       - name: Terraform validate
         run: terraform -chdir=Terraform/root validate
