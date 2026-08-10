@@ -15,5 +15,6 @@ terraform {
 
 provider "aws" {
   region = var.aws_region
+  skip_signature_validation = true
 }
 
