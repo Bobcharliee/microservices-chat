@@ -32,6 +32,8 @@ jobs:
           terraform_version: 1.6.0
     
       - name: Terraform Init
+        env: 
+            TF_SKIP_SIGNATURE_VALIDATION: true
         run: terraform -chdir=Terraform/root init
     
       - name: Terraform validate
