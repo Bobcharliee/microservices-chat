@@ -12,7 +12,9 @@ variable key_name {}
 variable security_group_ids {}
 variable target_group_arn {}
 variable secrets_arn {}
-variable ecr_arn {}
+variable chat_front_ecr_arn {}
+variable chat_svc_ecr_arn {}
+variable chat_db_ecr_arn {}
 variable deployment_bucket_name {
     type = string
 }

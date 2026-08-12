@@ -55,25 +55,23 @@ resource "aws_iam_role_policy" "ecr_access" {
     Version = "2012-10-17"
     Statement = [
       {
-        Effect   = "Allow"
-        Action   = [
+        Effect = "Allow"
+        Action = [
           "ecr:GetAuthorizationToken",
           "ecr:BatchCheckLayerAvailability",
           "ecr:GetDownloadUrlForLayer",
-          "ecr:BatchGetImage",
-          "ecr:PutImage",
-          "ecr:InitiateLayerUpload",
-          "ecr:UploadLayerPart",
-          "ecr:CompleteLayerUpload",
-          "ecr:StartInstanceRefresh",
+          "ecr:BatchGetImage"
         ]
-        Resource = "var.ecr_arn"
+        Resource = [
+          var.chat_front_ecr_arn,
+          var.chat_svc_ecr_arn,
+          var.chat_db_ecr_arn
+        ]
       },
-
       {
         Effect  = "Allow"
         Action  = "s3:GetObject"
-        Resource = "arn:aws:s3:::${var.deployment_bucket_name}/*" 
+        Resource = "arn:aws:s3:::${var.deployment_bucket_name}/*"
       }
     ]
   })

@@ -8,7 +8,6 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REGISTRY: 505265310396.dkr.ecr.us-east-1.amazonaws.com
-  TF_PLUGIN_SIGNATURE_VERIFICATION: none
 
 jobs:
   build-and-deploy:
@@ -26,39 +25,6 @@ jobs:
           aws-access-key-id: ${{ secrets.ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-
-      - name: Set up Terraform
-        uses: hashicorp/setup-terraform@v2
-        with:
-          terraform_version: 1.9.8
-    
-      - name: Terraform Init
-        env:
-          TF_SKIP_SIGNATURE_VALIDATION: true
-          TF_PLUGIN_SIGNATURE_VERIFICATION: none
-          TF_CLI_CONFIG_FILE: ${{ github.workspace }}/.terraformrc
-        run: |
-          cat > .terraformrc <<'EOF'
-          provider_installation {
-            filesystem_mirror {
-              path    = "$HOME/.terraform.d/plugins"
-              include = ["hashicorp/*"]
-            }
-            direct {
-              exclude = ["hashicorp/*"]
-            }
-          }
-          EOF
-          terraform -chdir=Terraform/root init -upgrade
-    
-      - name: Terraform validate
-        run: terraform -chdir=Terraform/root validate
-
-      - name: Terraform Plan
-        run: terraform -chdir=Terraform/root plan -out=tfplan
-        
-      - name: Terraform Apply
-        run: terraform -chdir=Terraform/root apply -auto-approve tfplan
       
       - name: login to Amazon ECR
         id: ecr-login
@@ -81,7 +47,7 @@ jobs:
       - name: Upload deployment files to S3
         run: |
           aws s3 cp docker-compose.deploy.yml s3://505265310396-deployment-bucket/docker-compose.deploy.yml
-          aws s3 cp debug.yaml s3://505265310396-deployment-bucket/debug.yaml
+          aws s3 cp .env s3://505265310396-deployment-bucket/.env
 
       - name: Trigger ASG instance refresh
         run: |

@@ -1,10 +1,5 @@
 resource "aws_s3_bucket" "deployment_bucket" {
   bucket = "505265310396-deployment-bucket"
-  acl    = "private"
-
-  versioning {
-    enabled = true
-  }
 }
 
 resource "aws_s3_bucket_public_access_block" "deployment_bucket_public_access_block" {

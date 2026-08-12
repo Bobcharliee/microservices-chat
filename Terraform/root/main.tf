@@ -41,7 +41,9 @@ module "asg" {
   key_name = var.key_name
   target_group_arn = module.alb.target_group_arn
   secrets_arn = module.secrets_manager.ms_db_secrets_arn
-  ecr_arn = module.ecr.ecr_arn
+  chat_front_ecr_arn = module.ecr.chat_front_ecr_arn
+  chat_svc_ecr_arn = module.ecr.chat_svc_ecr_arn
+  chat_db_ecr_arn = module.ecr.chat_db_ecr_arn
   deployment_bucket_name = module.s3.deployment_bucket_name
 }
 
