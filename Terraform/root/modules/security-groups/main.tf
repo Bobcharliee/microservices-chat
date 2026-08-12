@@ -51,9 +51,9 @@ resource "aws_security_group" "app_server_sg" {
   }
 
   ingress {
-    description     = "Allow application port 8080 from Load Balancer"
-    from_port       = var.http_port_2
-    to_port         = var.http_port_2
+    description     = "Allow frontend app port 3000 from Load Balancer"
+    from_port       = 3000
+    to_port         = 3000
     protocol        = var.tcp_protocol
     security_groups = [aws_security_group.load_balancer_sg.id]
   }

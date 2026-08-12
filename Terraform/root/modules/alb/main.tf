@@ -47,7 +47,6 @@ resource "aws_lb" "ms-load-balancer" {
   security_groups    = [var.load_balancer_security_group_id]
   subnets            = var.subnet_ids
 
-  enable_deletion_protection = true
 
   access_logs {
     bucket  = aws_s3_bucket.load_balancer_logs.id
@@ -60,7 +59,7 @@ resource "aws_lb" "ms-load-balancer" {
 
 resource "aws_lb_target_group" "ms-target-group" {
   name     = "${var.project_name}-tg"
-  port     = var.http_port
+  port     = 3000
   protocol = "HTTP"
   vpc_id   = var.vpc_id
 
