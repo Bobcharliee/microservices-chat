@@ -51,4 +51,15 @@ jobs:
 
       - name: Trigger ASG instance refresh
         run: |
-          aws autoscaling start-instance-refresh --auto-scaling-group-name ms_asg --preferences '{"MinHealthyPercentage": 50, "InstanceWarmup": 120}'
+          ASG_NAME=$(aws autoscaling describe-auto-scaling-groups \
+            --query "AutoScalingGroups[?contains(AutoScalingGroupName, 'microservices-app')].AutoScalingGroupName | [0]" \
+            --output text)
+
+          if [ -z "$ASG_NAME" ] || [ "$ASG_NAME" = "None" ]; then
+            echo "No Auto Scaling Group named with project prefix was found."
+            exit 1
+          fi
+
+          aws autoscaling start-instance-refresh \
+            --auto-scaling-group-name "$ASG_NAME" \
+            --preferences '{"MinHealthyPercentage": 50, "InstanceWarmup": 120}'
